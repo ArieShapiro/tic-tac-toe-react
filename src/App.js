@@ -17,18 +17,38 @@ class App extends React.Component {
   }
 
   handleClick(index) {
-    let boardStatus = [...this.state.boardStatus];
-    boardStatus[index] = this.state.isNextX ? 'X' : 'O';
-    this.setState({ boardStatus: boardStatus }, () => {
-      if (true) {
-        this.checkWinner()
-        // console.log('A Winner!!!!!!!!!!')
-      } else if (this.state.boardStatus.includes(null)) {
-        this.setState(state => ({ isNextX: !state.isNextX }));
-      } else if (!this.state.isGameOver) {
-        this.setState(state => ({ isGameOver: !state.isGameOver }));
-      }
-    })
+    if (!this.checkWinner() && !this.state.boardStatus[index]) {
+      let boardStatus = [...this.state.boardStatus];
+      boardStatus[index] = this.state.isNextX ? 'X' : 'O';
+      this.setState({
+        boardStatus
+      }, () => {
+        if (this.state.boardStatus.includes(null) && !this.checkWinner()) {
+          this.setState(state => ({
+            isNextX: !state.isNextX
+          }));
+        } else if (!this.state.isGameOver) {
+          this.setState(state => ({
+            isGameOver: !state.isGameOver
+          }));
+          if (this.checkWinner()) {
+            console.log('We have a winner!')
+            this.setState({
+              winner: this.state.boardStatus[index]
+            });
+          } else {
+            console.log('No winner...  :(')
+            this.setState({
+              winner: 'none'
+            });
+          }
+        }
+      })
+    } else if (this.checkWinner()) {
+      this.setState({
+        isGameOver: !this.state.isGameOver
+      });
+    }
   }
 
   checkWinner() {
@@ -44,10 +64,9 @@ class App extends React.Component {
       (board[0] === board[4] && board[4] === board[8] && board[8] !== null) ||
       (board[2] === board[4] && board[4] === board[6] && board[6] !== null)
     ) {
-      console.log('Win!!!')
+
       return true;
     } else {
-      console.log('No Win...')
       return false;
     }
   }
